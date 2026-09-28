@@ -1,0 +1,12 @@
+{
+    "[typescript]": {
+        "editor.defaultFormatter": "TypeScriptTeam.native-preview"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "TypeScriptTeam.native-preview"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "js/ts.experimental.useTsgo": true
+}

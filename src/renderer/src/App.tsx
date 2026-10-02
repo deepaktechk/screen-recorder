@@ -72,7 +72,7 @@ const App = (): React.JSX.Element => {
             sourceId: selectedSourceId,
             sourceName: source?.name ?? 'Screen',
             platform: capabilities.platform,
-            microphoneDeviceId: micEnabled ? (micDeviceId || 'default') : null,
+            microphoneDeviceId: micEnabled ? micDeviceId || 'default' : null,
             systemAudioDeviceId: sysAudioEnabled
                 ? capabilities.platform === 'linux'
                     ? sysAudioDeviceId
@@ -128,10 +128,7 @@ const App = (): React.JSX.Element => {
 
             {/* ── Loom 3-2-1 Animated Countdown Overlay ───────────────────── */}
             {recorder.countdown > 0 && (
-                <CountdownOverlay
-                    count={recorder.countdown}
-                    onCancel={recorder.cancelCountdown}
-                />
+                <CountdownOverlay count={recorder.countdown} onCancel={recorder.cancelCountdown} />
             )}
 
             {/* ── Main Studio Body ─────────────────────────────────────────── */}
@@ -170,7 +167,7 @@ const App = (): React.JSX.Element => {
                                 <button
                                     type="button"
                                     onClick={handleDownload}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-primary to-indigo-600 hover:opacity-95 shadow-md shadow-primary/25 px-4 py-1.5 rounded-xl font-bold text-white text-xs active:scale-95 transition-all"
+                                    className="flex items-center gap-2 bg-linear-to-r from-primary to-indigo-600 hover:opacity-95 shadow-md shadow-primary/25 px-4 py-1.5 rounded-xl font-bold text-white text-xs active:scale-95 transition-all"
                                 >
                                     <Download className="size-3.5" />
                                     Download video
@@ -179,13 +176,13 @@ const App = (): React.JSX.Element => {
                         </div>
 
                         {/* Video Player Card */}
-                        <div className="relative flex justify-center items-center bg-black shadow-xl my-4 border border-border/80 rounded-2xl max-h-[320px] overflow-hidden">
+                        <div className="relative flex justify-center items-center bg-black shadow-xl my-4 border border-border/80 rounded-2xl max-h-80 overflow-hidden">
                             <video
                                 src={recorder.previewUrl || undefined}
                                 controls
                                 autoPlay
                                 playsInline
-                                className="w-full max-h-[320px] object-contain"
+                                className="w-full max-h-80 object-contain"
                             />
                         </div>
 
@@ -198,7 +195,9 @@ const App = (): React.JSX.Element => {
                                 </span>
                                 <span className="text-muted-foreground/50">·</span>
                                 <span className="bg-muted px-2 py-0.5 rounded font-medium text-muted-foreground">
-                                    {formatDuration(Math.round(recorder.recording.durationMs / 1000))}
+                                    {formatDuration(
+                                        Math.round(recorder.recording.durationMs / 1000)
+                                    )}
                                 </span>
                                 <span className="bg-muted px-2 py-0.5 rounded font-medium text-muted-foreground">
                                     {formatBytes(recorder.recording.sizeBytes)}
@@ -206,7 +205,9 @@ const App = (): React.JSX.Element => {
                             </div>
 
                             <span className="font-medium text-emerald-500">
-                                {recorder.recording.hasAudio ? '🔊 Stereo Audio Mixed' : '🔇 Video Only'}
+                                {recorder.recording.hasAudio
+                                    ? '🔊 Stereo Audio Mixed'
+                                    : '🔇 Video Only'}
                             </span>
                         </div>
                     </div>
@@ -222,10 +223,13 @@ const App = (): React.JSX.Element => {
 
                             <div>
                                 <h2 className="font-bold text-foreground text-lg tracking-tight">
-                                    {recorder.status === 'paused' ? 'Recording Paused' : 'Recording in Progress'}
+                                    {recorder.status === 'paused'
+                                        ? 'Recording Paused'
+                                        : 'Recording in Progress'}
                                 </h2>
                                 <p className="mt-1 text-muted-foreground text-xs">
-                                    The floating pill is on your screen. You can control this recording from any app.
+                                    The floating pill is on your screen. You can control this
+                                    recording from any app.
                                 </p>
                             </div>
 
@@ -270,7 +274,12 @@ const App = (): React.JSX.Element => {
                                         disabled={isLoading || isRecordingActive}
                                         className="flex items-center gap-1.5 bg-card hover:bg-muted disabled:opacity-40 px-2.5 py-1 border border-border/60 rounded-lg font-semibold text-muted-foreground hover:text-foreground text-xs active:scale-95 transition-all"
                                     >
-                                        <RefreshCw className={['size-3', isLoading ? 'animate-spin' : ''].join(' ')} />
+                                        <RefreshCw
+                                            className={[
+                                                'size-3',
+                                                isLoading ? 'animate-spin' : ''
+                                            ].join(' ')}
+                                        />
                                         Refresh
                                     </button>
                                 </div>
@@ -321,7 +330,9 @@ const App = (): React.JSX.Element => {
                                             sysAudioEnabled={sysAudioEnabled}
                                             sysAudioDeviceId={sysAudioDeviceId}
                                             sysAudioDevices={systemAudioDevices}
-                                            canCaptureSystemAudio={capabilities.canCaptureSystemAudio}
+                                            canCaptureSystemAudio={
+                                                capabilities.canCaptureSystemAudio
+                                            }
                                             platform={capabilities.platform}
                                             onSysAudioEnabledChange={setSysAudioEnabled}
                                             onSysAudioDeviceChange={setSysAudioDeviceId}
@@ -340,7 +351,8 @@ const App = (): React.JSX.Element => {
                                 <div className="flex items-center gap-2 text-muted-foreground text-xs">
                                     <span className="bg-primary rounded-full size-2 animate-pulse" />
                                     <span>
-                                        <strong className="text-foreground">Loom Pill:</strong> Stays on top to Pause, Restart, or Finish anywhere.
+                                        <strong className="text-foreground">Loom Pill:</strong>{' '}
+                                        Stays on top to Pause, Restart, or Finish anywhere.
                                     </span>
                                 </div>
 
@@ -349,7 +361,9 @@ const App = (): React.JSX.Element => {
                                     {recorder.error && (
                                         <div className="flex items-center gap-1.5 text-destructive text-xs">
                                             <AlertCircle className="size-3.5" />
-                                            <span className="max-w-[200px] truncate">{recorder.error}</span>
+                                            <span className="max-w-50 truncate">
+                                                {recorder.error}
+                                            </span>
                                         </div>
                                     )}
 
@@ -360,7 +374,7 @@ const App = (): React.JSX.Element => {
                                         className={[
                                             'group relative flex items-center justify-center gap-2.5 rounded-xl px-7 py-2.5 text-xs font-bold text-white shadow-md transition-all duration-200',
                                             canStart
-                                                ? 'bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 hover:from-indigo-500 hover:to-violet-500 shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]'
+                                                ? 'bg-linear-to-r from-indigo-600 via-violet-600 to-indigo-700 hover:from-indigo-500 hover:to-violet-500 shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]'
                                                 : 'bg-muted text-muted-foreground shadow-none cursor-not-allowed opacity-50'
                                         ].join(' ')}
                                     >

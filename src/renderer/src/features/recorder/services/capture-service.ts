@@ -44,9 +44,7 @@ export function tagMonitorDevices(
     devices: AudioDevice[],
     linuxMonitors: LinuxMonitorInfo[]
 ): AudioDevice[] {
-    const monitorDescriptions = new Set(
-        linuxMonitors.map((m) => m.description.toLowerCase())
-    )
+    const monitorDescriptions = new Set(linuxMonitors.map((m) => m.description.toLowerCase()))
 
     return devices.map((device) => {
         const labelLower = device.label.toLowerCase()
@@ -74,7 +72,9 @@ async function captureAudioDevice(deviceId: string): Promise<MediaStream> {
  * Merge multiple audio streams into a single audio track using Web Audio API.
  * Ensures MediaRecorder does not drop additional audio tracks.
  */
-async function mixAudioStreams(streams: MediaStream[]): Promise<{ track: MediaStreamTrack; cleanup: () => void } | null> {
+async function mixAudioStreams(
+    streams: MediaStream[]
+): Promise<{ track: MediaStreamTrack; cleanup: () => void } | null> {
     const audioTracks = streams.flatMap((s) => s.getAudioTracks())
     if (audioTracks.length === 0) return null
     if (audioTracks.length === 1) return { track: audioTracks[0], cleanup: () => {} }

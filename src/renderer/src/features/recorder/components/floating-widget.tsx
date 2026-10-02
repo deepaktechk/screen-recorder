@@ -1,12 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-    GripVertical,
-    Pause,
-    Play,
-    Square,
-    RotateCcw,
-    Trash2
-} from 'lucide-react'
+import { GripVertical, Pause, Play, Square, RotateCcw, Trash2 } from 'lucide-react'
 import type { RecorderAction, WidgetState } from '@shared/contracts/ipc'
 
 function formatTimer(totalSeconds: number): string {
@@ -39,45 +32,47 @@ export function FloatingWidget(): React.JSX.Element {
         }
     }, [])
 
-    const sendAction = (action: RecorderAction) => {
+    const sendAction = (action: RecorderAction): void => {
         void window.screenRecorder.widget.sendAction(action)
     }
 
     const isPaused = state.status === 'paused'
 
     return (
-        <div className="flex h-full w-full items-center justify-center p-1 select-none">
+        <div className="flex justify-center items-center p-1 w-full h-full select-none">
             {/* ── Main Loom Pill ────────────────────────────────────────── */}
             <div
-                className="group flex items-center gap-2 rounded-full border border-white/15 bg-neutral-900/95 px-3 py-1.5 text-white shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all"
+                className="group flex items-center gap-2 bg-neutral-900/95 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-2xl px-3 py-1.5 border border-white/15 rounded-full text-white transition-all"
                 style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
             >
                 {/* Drag handle */}
                 <div
-                    className="flex cursor-grab items-center text-white/40 transition-colors hover:text-white/80 active:cursor-grabbing"
+                    className="flex items-center text-white/40 hover:text-white/80 transition-colors cursor-grab active:cursor-grabbing"
                     title="Drag to reposition widget"
                 >
                     <GripVertical className="size-3.5" />
                 </div>
 
                 {/* Status Dot & Elapsed Timer */}
-                <div className="flex items-center gap-2 pr-1 font-mono text-xs font-semibold tabular-nums">
+                <div className="flex items-center gap-2 pr-1 font-mono font-semibold tabular-nums text-xs">
                     {isPaused ? (
                         <div className="flex items-center gap-1.5 text-amber-400">
-                            <span className="size-2 rounded-full bg-amber-400" />
-                            <span className="text-[10px] font-bold tracking-wider uppercase">Paused</span>
+                            <span className="bg-amber-400 rounded-full size-2" />
+                            <span className="font-bold text-[10px] uppercase tracking-wider">
+                                Paused
+                            </span>
                             <span>{formatTimer(state.elapsedSeconds)}</span>
                         </div>
                     ) : (
                         <div className="flex items-center gap-1.5 text-white">
-                            <span className="size-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                            <span className="bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] rounded-full size-2 animate-pulse" />
                             <span>{formatTimer(state.elapsedSeconds)}</span>
                         </div>
                     )}
                 </div>
 
                 {/* Divider */}
-                <div className="h-4 w-[1px] bg-white/15" />
+                <div className="bg-white/15 w-[1px] h-4" />
 
                 {/* ── Control Actions ──────────────────────────────────── */}
                 <div
@@ -89,19 +84,19 @@ export function FloatingWidget(): React.JSX.Element {
                         <button
                             type="button"
                             onClick={() => sendAction('resume')}
-                            className="flex size-7 items-center justify-center rounded-full bg-amber-500/20 text-amber-300 transition-all hover:bg-amber-500/30 hover:scale-105 active:scale-95"
+                            className="flex justify-center items-center bg-amber-500/20 hover:bg-amber-500/30 rounded-full size-7 text-amber-300 hover:scale-105 active:scale-95 transition-all"
                             title="Resume recording"
                         >
-                            <Play className="size-3 fill-current ml-0.5" />
+                            <Play className="fill-current ml-0.5 size-3" />
                         </button>
                     ) : (
                         <button
                             type="button"
                             onClick={() => sendAction('pause')}
-                            className="flex size-7 items-center justify-center rounded-full bg-white/10 text-white/90 transition-all hover:bg-white/20 hover:text-white hover:scale-105 active:scale-95"
+                            className="flex justify-center items-center bg-white/10 hover:bg-white/20 rounded-full size-7 text-white/90 hover:text-white hover:scale-105 active:scale-95 transition-all"
                             title="Pause recording"
                         >
-                            <Pause className="size-3 fill-current" />
+                            <Pause className="fill-current size-3" />
                         </button>
                     )}
 
@@ -109,17 +104,17 @@ export function FloatingWidget(): React.JSX.Element {
                     <button
                         type="button"
                         onClick={() => sendAction('stop')}
-                        className="relative flex size-7 items-center justify-center rounded-full bg-red-600 text-white shadow-[0_0_12px_rgba(220,38,38,0.5)] transition-all hover:bg-red-500 hover:scale-105 active:scale-95"
+                        className="relative flex justify-center items-center bg-red-600 hover:bg-red-500 shadow-[0_0_12px_rgba(220,38,38,0.5)] rounded-full size-7 text-white hover:scale-105 active:scale-95 transition-all"
                         title="Finish & Save recording"
                     >
-                        <Square className="size-2.5 fill-current" />
+                        <Square className="fill-current size-2.5" />
                     </button>
 
                     {/* Restart */}
                     <button
                         type="button"
                         onClick={() => sendAction('restart')}
-                        className="flex size-7 items-center justify-center rounded-full bg-white/10 text-white/70 transition-all hover:bg-white/20 hover:text-white hover:scale-105 active:scale-95"
+                        className="flex justify-center items-center bg-white/10 hover:bg-white/20 rounded-full size-7 text-white/70 hover:text-white hover:scale-105 active:scale-95 transition-all"
                         title="Restart recording"
                     >
                         <RotateCcw className="size-3" />
@@ -129,7 +124,7 @@ export function FloatingWidget(): React.JSX.Element {
                     <button
                         type="button"
                         onClick={() => sendAction('cancel')}
-                        className="flex size-7 items-center justify-center rounded-full bg-white/10 text-white/50 transition-all hover:bg-red-500/20 hover:text-red-400 hover:scale-105 active:scale-95"
+                        className="flex justify-center items-center bg-white/10 hover:bg-red-500/20 rounded-full size-7 text-white/50 hover:text-red-400 hover:scale-105 active:scale-95 transition-all"
                         title="Cancel & discard recording"
                     >
                         <Trash2 className="size-3" />

@@ -7,8 +7,5 @@ import { FloatingWidget } from './features/recorder/components/floating-widget'
 const isWidgetView = window.location.hash.includes('widget')
 
 createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        {isWidgetView ? <FloatingWidget /> : <App />}
-    </StrictMode>
+    <StrictMode>{isWidgetView ? <FloatingWidget /> : <App />}</StrictMode>
 )
-

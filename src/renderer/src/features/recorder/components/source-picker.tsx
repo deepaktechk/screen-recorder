@@ -25,7 +25,7 @@ export function SourcePicker({
 
     const activeList = tab === 'screen' ? screens : windows
 
-    const handleTabChange = (newTab: 'screen' | 'window') => {
+    const handleTabChange = (newTab: 'screen' | 'window'): void => {
         setTab(newTab)
         const targetList = newTab === 'screen' ? screens : windows
         if (!targetList.some((s) => s.id === selectedSourceId) && targetList[0]) {
@@ -36,7 +36,7 @@ export function SourcePicker({
     return (
         <div className="flex flex-col gap-4">
             {/* ── Mode Pill Switcher ──────────────────────────────────── */}
-            <div className="flex items-center gap-1.5 rounded-xl bg-muted/50 p-1 border border-border/40 w-fit">
+            <div className="flex items-center gap-1.5 bg-muted/50 p-1 border border-border/40 rounded-xl w-fit">
                 <button
                     type="button"
                     disabled={disabled || screens.length === 0}
@@ -50,7 +50,7 @@ export function SourcePicker({
                 >
                     <Monitor className="size-3.5" />
                     <span>Entire Screen</span>
-                    <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
+                    <span className="bg-muted px-1.5 py-0.5 rounded-md font-bold text-[10px] text-muted-foreground">
                         {screens.length}
                     </span>
                 </button>
@@ -68,7 +68,7 @@ export function SourcePicker({
                 >
                     <AppWindow className="size-3.5" />
                     <span>App Window</span>
-                    <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
+                    <span className="bg-muted px-1.5 py-0.5 rounded-md font-bold text-[10px] text-muted-foreground">
                         {windows.length}
                     </span>
                 </button>
@@ -76,7 +76,7 @@ export function SourcePicker({
 
             {/* ── Source Content Display ──────────────────────────────── */}
             {activeList.length === 0 ? (
-                <div className="flex h-44 items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/10 text-xs text-muted-foreground">
+                <div className="flex justify-center items-center bg-muted/10 border border-border/60 border-dashed rounded-2xl h-44 text-muted-foreground text-xs">
                     No {tab === 'screen' ? 'screens' : 'windows'} detected.
                 </div>
             ) : tab === 'screen' && screens.length === 1 ? (
@@ -96,34 +96,34 @@ export function SourcePicker({
                                     'group relative flex flex-col gap-3 rounded-2xl border p-3 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                                     'disabled:pointer-events-none disabled:opacity-50 max-w-md',
                                     isSelected
-                                        ? 'border-primary bg-primary/[0.04] shadow-md shadow-primary/10 ring-2 ring-primary/20'
+                                        ? 'border-primary bg-primary/4 shadow-md shadow-primary/10 ring-2 ring-primary/20'
                                         : 'border-border/60 bg-card hover:border-primary/40 hover:bg-accent/20'
                                 ].join(' ')}
                             >
-                                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black/60 shadow-inner">
+                                <div className="relative bg-black/60 shadow-inner rounded-xl w-full aspect-video overflow-hidden">
                                     <img
                                         src={source.thumbnailDataUrl}
                                         alt={source.name}
-                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
                                         loading="lazy"
                                     />
                                     {isSelected && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-primary/20 backdrop-blur-[1px]">
-                                            <div className="flex size-9 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40">
+                                        <div className="absolute inset-0 flex justify-center items-center bg-primary/20 backdrop-blur-[1px]">
+                                            <div className="flex justify-center items-center bg-primary shadow-lg shadow-primary/40 rounded-full size-9 text-white">
                                                 <Check className="size-5" strokeWidth={2.5} />
                                             </div>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="flex items-center justify-between px-1">
+                                <div className="flex justify-between items-center px-1">
                                     <div className="flex items-center gap-2">
                                         <Monitor className="size-4 text-primary" />
-                                        <span className="text-xs font-bold text-foreground">
+                                        <span className="font-bold text-foreground text-xs">
                                             {source.name}
                                         </span>
                                     </div>
-                                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                                    <span className="bg-primary/10 px-2 py-0.5 rounded-full font-bold text-[10px] text-primary">
                                         Primary Display
                                     </span>
                                 </div>
@@ -133,7 +133,7 @@ export function SourcePicker({
                 </div>
             ) : (
                 /* ── Multi-item Grid (Windows or Multi-Screen) ────────── */
-                <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="gap-3 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 pr-1 max-h-75 overflow-y-auto">
                     {activeList.map((source) => {
                         const isSelected = source.id === selectedSourceId
 
@@ -148,20 +148,20 @@ export function SourcePicker({
                                     'group relative flex flex-col gap-2 rounded-2xl border p-2.5 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                                     'disabled:pointer-events-none disabled:opacity-50',
                                     isSelected
-                                        ? 'border-primary bg-primary/[0.04] shadow-sm ring-2 ring-primary/20'
+                                        ? 'border-primary bg-primary/4 shadow-sm ring-2 ring-primary/20'
                                         : 'border-border/60 bg-card hover:border-primary/40 hover:bg-accent/20'
                                 ].join(' ')}
                             >
-                                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black/50">
+                                <div className="relative bg-black/50 rounded-xl w-full aspect-video overflow-hidden">
                                     <img
                                         src={source.thumbnailDataUrl}
                                         alt={source.name}
-                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                                         loading="lazy"
                                     />
                                     {isSelected && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-primary/20 backdrop-blur-[1px]">
-                                            <div className="flex size-7 items-center justify-center rounded-full bg-primary text-white shadow-md shadow-primary/30">
+                                        <div className="absolute inset-0 flex justify-center items-center bg-primary/20 backdrop-blur-[1px]">
+                                            <div className="flex justify-center items-center bg-primary shadow-md shadow-primary/30 rounded-full size-7 text-white">
                                                 <Check className="size-4" strokeWidth={2.5} />
                                             </div>
                                         </div>

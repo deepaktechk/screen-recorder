@@ -1,13 +1,4 @@
-import {
-    Square,
-    Circle,
-    RotateCcw,
-    Download,
-    Loader2,
-    Pause,
-    Play,
-    Trash2
-} from 'lucide-react'
+import { Square, Circle, RotateCcw, Download, Loader2, Pause, Play, Trash2 } from 'lucide-react'
 import type { RecorderStatus, Recording } from '@shared/contracts/recording'
 
 type RecordingControlsProps = {
@@ -78,7 +69,7 @@ export function RecordingControls({
                             isPaused ? 'bg-amber-500' : 'recording-pulse bg-destructive'
                         ].join(' ')}
                     />
-                    <span className="font-mono text-sm font-bold tabular-nums">
+                    <span className="font-mono font-bold tabular-nums text-sm">
                         {formatDuration(elapsedSeconds)}
                     </span>
                     <span
@@ -94,7 +85,7 @@ export function RecordingControls({
 
             {/* Status text */}
             {(isBusy || isCountingDown) && (
-                <div className="fade-in flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-muted-foreground text-sm fade-in">
                     <Loader2 className="size-3.5 animate-spin" />
                     {status === 'requesting-permission'
                         ? 'Preparing screen capture…'
@@ -106,29 +97,29 @@ export function RecordingControls({
 
             {/* Recording metadata */}
             {isReady && recording && (
-                <div className="fade-in flex flex-wrap justify-center gap-x-3 gap-y-1 rounded-lg bg-muted/40 px-4 py-2">
-                    <span className="text-xs font-medium text-foreground">
+                <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 bg-muted/40 px-4 py-2 rounded-lg fade-in">
+                    <span className="font-medium text-foreground text-xs">
                         {formatDuration(Math.round(recording.durationMs / 1000))}
                     </span>
-                    <span className="text-xs text-muted-foreground">·</span>
-                    <span className="text-xs font-medium text-foreground">
+                    <span className="text-muted-foreground text-xs">·</span>
+                    <span className="font-medium text-foreground text-xs">
                         {formatBytes(recording.sizeBytes)}
                     </span>
-                    <span className="text-xs text-muted-foreground">·</span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-muted-foreground text-xs">·</span>
+                    <span className="text-muted-foreground text-xs">
                         {recording.hasAudio ? '🔊 Audio included' : '🔇 Video only'}
                     </span>
                 </div>
             )}
 
             {/* Action buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5">
+            <div className="flex flex-wrap justify-center items-center gap-2.5">
                 {isRecording || isPaused ? (
                     <>
                         {isPaused ? (
                             <ActionButton
                                 variant="secondary"
-                                icon={<Play className="size-3.5 fill-current ml-0.5" />}
+                                icon={<Play className="fill-current ml-0.5 size-3.5" />}
                                 onClick={onResume}
                             >
                                 Resume
@@ -136,7 +127,7 @@ export function RecordingControls({
                         ) : (
                             <ActionButton
                                 variant="secondary"
-                                icon={<Pause className="size-3.5 fill-current" />}
+                                icon={<Pause className="fill-current size-3.5" />}
                                 onClick={onPause}
                             >
                                 Pause
@@ -176,7 +167,7 @@ export function RecordingControls({
                             isBusy || isCountingDown ? (
                                 <Loader2 className="size-3.5 animate-spin" />
                             ) : (
-                                <Circle className="size-3.5 fill-current" strokeWidth={0} />
+                                <Circle className="fill-current size-3.5" strokeWidth={0} />
                             )
                         }
                         onClick={onStart}

@@ -47,11 +47,7 @@ export function AudioSettings({
             <AudioCard
                 enabled={micEnabled}
                 disabled={disabled || !canCaptureMicrophone}
-                icon={
-                    micEnabled
-                        ? <Mic className="h-4 w-4" />
-                        : <MicOff className="h-4 w-4" />
-                }
+                icon={micEnabled ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
                 title="Microphone"
                 subtitle={
                     !canCaptureMicrophone
@@ -64,11 +60,16 @@ export function AudioSettings({
             >
                 {micEnabled && (
                     <div
-                        className="border-t border-border/30 bg-muted/20"
-                        style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+                        className="bg-muted/20 border-border/30 border-t"
+                        style={{
+                            padding: '12px 14px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px'
+                        }}
                     >
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        <div className="flex justify-between items-center">
+                            <span className="font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
                                 Input Device
                             </span>
                             <div className="flex items-center" style={{ gap: '6px' }}>
@@ -103,9 +104,11 @@ export function AudioSettings({
                 enabled={sysAudioEnabled}
                 disabled={disabled || !canCaptureSystemAudio}
                 icon={
-                    sysAudioEnabled
-                        ? <Volume2 className="h-4 w-4" />
-                        : <VolumeX className="h-4 w-4" />
+                    sysAudioEnabled ? (
+                        <Volume2 className="w-4 h-4" />
+                    ) : (
+                        <VolumeX className="w-4 h-4" />
+                    )
                 }
                 title="System Audio"
                 subtitle={
@@ -119,11 +122,16 @@ export function AudioSettings({
             >
                 {sysAudioEnabled && platform === 'linux' && (
                     <div
-                        className="border-t border-border/30 bg-muted/20"
-                        style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+                        className="bg-muted/20 border-border/30 border-t"
+                        style={{
+                            padding: '12px 14px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px'
+                        }}
                     >
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        <div className="flex justify-between items-center">
+                            <span className="font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
                                 Loopback Source
                             </span>
                             {onRefreshDevices && (
@@ -176,15 +184,12 @@ function AudioCard({
                 disabled
                     ? 'border-border/30 bg-muted/10 opacity-50'
                     : enabled
-                      ? 'border-primary/30 bg-primary/[0.03]'
+                      ? 'border-primary/30 bg-primary/3'
                       : 'border-border/50 bg-card hover:border-border/70'
             ].join(' ')}
         >
             {/* Header */}
-            <div
-                className="flex items-center justify-between"
-                style={{ padding: '12px 14px' }}
-            >
+            <div className="flex justify-between items-center" style={{ padding: '12px 14px' }}>
                 <div className="flex items-center" style={{ gap: '10px' }}>
                     {/* Icon */}
                     <div
@@ -201,11 +206,11 @@ function AudioCard({
 
                     {/* Text */}
                     <div>
-                        <p className="text-xs font-semibold leading-tight text-foreground">
+                        <p className="font-semibold text-foreground text-xs leading-tight">
                             {title}
                         </p>
                         <p
-                            className="leading-tight text-muted-foreground"
+                            className="text-muted-foreground leading-tight"
                             style={{ marginTop: '2px', fontSize: '11px' }}
                         >
                             {subtitle}
@@ -267,11 +272,15 @@ function SelectInput({
                     'transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30',
                     'disabled:cursor-not-allowed'
                 ].join(' ')}
-                style={{ paddingBlock: '7px', paddingInlineStart: '10px', paddingInlineEnd: '28px' }}
+                style={{
+                    paddingBlock: '7px',
+                    paddingInlineStart: '10px',
+                    paddingInlineEnd: '28px'
+                }}
             >
                 {children}
             </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <ChevronDown className="top-1/2 right-2.5 absolute w-3.5 h-3.5 text-muted-foreground -translate-y-1/2 pointer-events-none" />
         </div>
     )
 }
@@ -281,10 +290,10 @@ function SelectInput({
 function WarningBanner({ message }: { message: string }): React.JSX.Element {
     return (
         <div
-            className="flex items-center rounded-lg border border-amber-500/20 bg-amber-500/5 text-amber-500"
+            className="flex items-center bg-amber-500/5 border border-amber-500/20 rounded-lg text-amber-500"
             style={{ gap: '6px', paddingBlock: '7px', paddingInline: '10px', fontSize: '11px' }}
         >
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
             <span>{message}</span>
         </div>
     )
@@ -304,11 +313,11 @@ function RefreshButton({
             type="button"
             onClick={onClick}
             disabled={disabled}
-            className="flex items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex items-center hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
             style={{ gap: '3px', paddingBlock: '2px', paddingInline: '5px', fontSize: '10px' }}
             title="Refresh audio devices"
         >
-            <RefreshCw className="h-2.5 w-2.5" />
+            <RefreshCw className="w-2.5 h-2.5" />
         </button>
     )
 }

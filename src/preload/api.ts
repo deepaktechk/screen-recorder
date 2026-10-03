@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron/renderer'
 import type { RecorderAction, ScreenRecorderApi, WidgetState } from '@shared/contracts/ipc'
 
 export const screenRecorderApi: ScreenRecorderApi = {

@@ -1,14 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-    Minus,
-    Square,
-    Copy,
-    X,
-    ScreenShare,
-    Sun,
-    Moon,
-    Monitor
-} from 'lucide-react'
+import { Minus, Square, Copy, X, Video, Sun, Moon, Monitor } from 'lucide-react'
 
 type TitleBarProps = {
     theme: 'light' | 'dark' | 'system'
@@ -39,88 +30,81 @@ export function TitleBar({
         }
     }, [])
 
-    const handleMinimize = () => {
+    const handleMinimize = (): void => {
         void window.screenRecorder?.window?.minimize()
     }
 
-    const handleMaximize = () => {
+    const handleMaximize = (): void => {
         void window.screenRecorder?.window?.maximize()
     }
 
-    const handleClose = () => {
+    const handleClose = (): void => {
         void window.screenRecorder?.window?.close()
     }
 
-    const ThemeIcon =
-        theme === 'system' ? Monitor : resolvedTheme === 'dark' ? Moon : Sun
+    const ThemeIcon = theme === 'system' ? Monitor : resolvedTheme === 'dark' ? Moon : Sun
 
     return (
         <header
-            className="flex h-11 w-full select-none items-center justify-between border-b border-border/40 bg-card/60 px-3 backdrop-blur-xl"
+            className="flex h-10 w-full shrink-0 select-none items-center justify-between border-b border-border/50 bg-card/70 px-3 backdrop-blur-xl"
             style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
         >
-            {/* ── Brand Logo & Title ────────────────────────────────────── */}
-            <div className="flex items-center gap-2.5 pl-1">
-                <div className="flex size-6.5 items-center justify-center rounded-lg bg-gradient-to-tr from-primary to-indigo-500 shadow-sm shadow-primary/20">
-                    <ScreenShare className="size-3.5 text-white" />
+            {/* ── Brand ────────────────────────────────────────────────── */}
+            <div className="flex items-center gap-2.5">
+                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-primary to-violet-500 shadow-sm">
+                    <Video className="h-3 w-3 text-white" strokeWidth={2.5} />
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold tracking-tight text-foreground">
-                        Capturely
-                    </span>
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase text-primary">
-                        Studio
-                    </span>
-                </div>
-            </div>
-
-            {/* ── Right: Theme Toggle & Window Controls ────────────────── */}
-            <div
-                className="flex items-center gap-1"
-                style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-            >
+                <span className="text-[13px] font-semibold tracking-tight text-foreground">
+                    Capturely
+                </span>
                 {platform && (
-                    <span className="mr-2 rounded-md bg-muted/60 px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase text-muted-foreground/70">
+                    <span className="rounded bg-muted/80 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
                         {platform}
                     </span>
                 )}
+            </div>
 
-                {/* Theme switch */}
+            {/* ── Right Controls ───────────────────────────────────────── */}
+            <div
+                className="flex items-center gap-0.5"
+                style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            >
+                {/* Theme toggle */}
                 <button
                     type="button"
                     onClick={onCycleTheme}
-                    className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     title={`Theme: ${theme}`}
                     aria-label="Switch theme"
                 >
-                    <ThemeIcon className="size-3.5" />
+                    <ThemeIcon className="h-3.5 w-3.5" />
                 </button>
 
-                <div className="mx-1 h-3.5 w-[1px] bg-border/60" />
+                <div className="mx-1.5 h-3.5 w-px bg-border/60" />
 
                 {/* Minimize */}
                 <button
                     type="button"
                     onClick={handleMinimize}
-                    className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
                     title="Minimize"
                     aria-label="Minimize window"
                 >
-                    <Minus className="size-3.5" />
+                    <Minus className="h-3.5 w-3.5" />
                 </button>
 
-                {/* Maximize / Restore */}
+                {/* Maximize */}
                 <button
                     type="button"
                     onClick={handleMaximize}
-                    className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
                     title={isMaximized ? 'Restore' : 'Maximize'}
                     aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
                 >
                     {isMaximized ? (
-                        <Copy className="size-3 rotate-180" />
+                        <Copy className="h-3 w-3 rotate-180" />
                     ) : (
-                        <Square className="size-3" />
+                        <Square className="h-3 w-3" />
                     )}
                 </button>
 
@@ -128,11 +112,11 @@ export function TitleBar({
                 <button
                     type="button"
                     onClick={handleClose}
-                    className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive hover:text-destructive-foreground active:scale-95"
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/80 hover:text-white active:scale-95"
                     title="Close"
                     aria-label="Close window"
                 >
-                    <X className="size-3.5" />
+                    <X className="h-3.5 w-3.5" />
                 </button>
             </div>
         </header>

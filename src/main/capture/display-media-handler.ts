@@ -1,7 +1,11 @@
-import { desktopCapturer, ipcMain, session } from 'electron'
+import { desktopCapturer, ipcMain, session } from 'electron/main'
 import { execFile } from 'child_process'
 import { promisify } from 'util'
-import type { CaptureCapabilities, CaptureSource, LinuxMonitorInfo } from '../../shared/contracts/capture'
+import type {
+    CaptureCapabilities,
+    CaptureSource,
+    LinuxMonitorInfo
+} from '../../shared/contracts/capture'
 
 const execFileAsync = promisify(execFile)
 
@@ -35,9 +39,7 @@ async function fetchDesktopSources(thumbnailSize: {
     return sources
 }
 
-function mapToCaptureSources(
-    sources: Electron.DesktopCapturerSource[]
-): CaptureSource[] {
+function mapToCaptureSources(sources: Electron.DesktopCapturerSource[]): CaptureSource[] {
     return sources.map((source) => ({
         id: source.id,
         name: source.name,
@@ -60,11 +62,9 @@ async function detectLinuxMonitors(): Promise<LinuxMonitorInfo[]> {
 
     // Attempt 1: pactl with JSON output (PulseAudio >= 16, PipeWire)
     try {
-        const { stdout } = await execFileAsync(
-            'pactl',
-            ['-f', 'json', 'list', 'sources'],
-            { timeout: 5000 }
-        )
+        const { stdout } = await execFileAsync('pactl', ['-f', 'json', 'list', 'sources'], {
+            timeout: 5000
+        })
         const sources = JSON.parse(stdout) as Array<{
             name: string
             description: string
@@ -80,11 +80,7 @@ async function detectLinuxMonitors(): Promise<LinuxMonitorInfo[]> {
 
     // Attempt 2: pactl list sources (text output)
     try {
-        const { stdout } = await execFileAsync(
-            'pactl',
-            ['list', 'sources'],
-            { timeout: 5000 }
-        )
+        const { stdout } = await execFileAsync('pactl', ['list', 'sources'], { timeout: 5000 })
 
         const monitors: LinuxMonitorInfo[] = []
         let currentName = ''
@@ -179,8 +175,7 @@ export function registerDisplayMediaHandler(): void {
             }
 
             const sources = await fetchDesktopSources({ width: 640, height: 360 })
-            const source =
-                sources.find(({ id }) => id === selectedSourceId) ?? sources[0]
+            const source = sources.find(({ id }) => id === selectedSourceId) ?? sources[0]
 
             if (!source) {
                 callback({})

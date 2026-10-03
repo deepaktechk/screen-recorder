@@ -18,9 +18,7 @@ type RecordingControlsProps = {
 
 function formatDuration(totalSeconds: number): string {
     const h = Math.floor(totalSeconds / 3600)
-    const m = Math.floor((totalSeconds % 3600) / 60)
-        .toString()
-        .padStart(2, '0')
+    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0')
     const s = (totalSeconds % 60).toString().padStart(2, '0')
     return h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`
 }
@@ -52,74 +50,85 @@ export function RecordingControls({
     const isError = status === 'error'
 
     return (
-        <div className="flex flex-col items-center gap-4">
-            {/* Recording badge */}
+        <div className="flex w-full flex-col items-center" style={{ gap: '16px' }}>
+            {/* ── Timer badge ──────────────────────────────────────────── */}
             {(isRecording || isPaused) && (
                 <div
                     className={[
-                        'fade-in flex items-center gap-2.5 rounded-full border px-4 py-2 shadow-sm',
+                        'fade-in flex items-center rounded-full border',
                         isPaused
-                            ? 'border-amber-500/20 bg-amber-500/10 text-amber-500'
-                            : 'border-destructive/20 bg-destructive/8 text-destructive'
+                            ? 'border-amber-500/20 bg-amber-500/10 text-amber-400'
+                            : 'border-red-500/20 bg-red-500/10 text-red-400'
                     ].join(' ')}
+                    style={{ gap: '8px', paddingBlock: '7px', paddingInline: '16px' }}
                 >
                     <span
                         className={[
-                            'size-2.5 rounded-full',
-                            isPaused ? 'bg-amber-500' : 'recording-pulse bg-destructive'
+                            'block h-2.5 w-2.5 rounded-full',
+                            isPaused ? 'bg-amber-400' : 'recording-pulse bg-red-500'
                         ].join(' ')}
                     />
-                    <span className="font-mono font-bold tabular-nums text-sm">
+                    <span className="font-mono text-sm font-bold tabular-nums">
                         {formatDuration(elapsedSeconds)}
                     </span>
                     <span
                         className={[
-                            'rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase',
-                            isPaused ? 'bg-amber-500/15' : 'bg-destructive/15'
+                            'rounded text-[10px] font-bold uppercase tracking-wider',
+                            isPaused ? 'bg-amber-500/15' : 'bg-red-500/15'
                         ].join(' ')}
+                        style={{ paddingBlock: '2px', paddingInline: '6px' }}
                     >
                         {isPaused ? 'PAUSED' : 'REC'}
                     </span>
                 </div>
             )}
 
-            {/* Status text */}
+            {/* ── Busy state ───────────────────────────────────────────── */}
             {(isBusy || isCountingDown) && (
-                <div className="flex items-center gap-2 text-muted-foreground text-sm fade-in">
-                    <Loader2 className="size-3.5 animate-spin" />
+                <div
+                    className="fade-in flex items-center text-sm text-muted-foreground"
+                    style={{ gap: '7px' }}
+                >
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     {status === 'requesting-permission'
                         ? 'Preparing screen capture…'
                         : isCountingDown
                           ? 'Starting in a moment…'
-                          : 'Finalizing recording…'}
+                          : 'Finalising recording…'}
                 </div>
             )}
 
-            {/* Recording metadata */}
+            {/* ── Metadata (after stop) ────────────────────────────────── */}
             {isReady && recording && (
-                <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 bg-muted/40 px-4 py-2 rounded-lg fade-in">
-                    <span className="font-medium text-foreground text-xs">
+                <div
+                    className="fade-in flex flex-wrap items-center justify-center rounded-lg bg-muted/40"
+                    style={{ gap: '6px', paddingBlock: '7px', paddingInline: '16px' }}
+                >
+                    <span className="text-xs font-medium text-foreground">
                         {formatDuration(Math.round(recording.durationMs / 1000))}
                     </span>
-                    <span className="text-muted-foreground text-xs">·</span>
-                    <span className="font-medium text-foreground text-xs">
+                    <span className="text-xs text-muted-foreground">·</span>
+                    <span className="text-xs font-medium text-foreground">
                         {formatBytes(recording.sizeBytes)}
                     </span>
-                    <span className="text-muted-foreground text-xs">·</span>
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-xs text-muted-foreground">·</span>
+                    <span className="text-xs text-muted-foreground">
                         {recording.hasAudio ? '🔊 Audio included' : '🔇 Video only'}
                     </span>
                 </div>
             )}
 
-            {/* Action buttons */}
-            <div className="flex flex-wrap justify-center items-center gap-2.5">
+            {/* ── Action buttons ───────────────────────────────────────── */}
+            <div
+                className="flex flex-wrap items-center justify-center"
+                style={{ gap: '8px' }}
+            >
                 {isRecording || isPaused ? (
                     <>
                         {isPaused ? (
                             <ActionButton
                                 variant="secondary"
-                                icon={<Play className="fill-current ml-0.5 size-3.5" />}
+                                icon={<Play className="h-3.5 w-3.5 fill-current" style={{ marginLeft: '2px' }} />}
                                 onClick={onResume}
                             >
                                 Resume
@@ -127,7 +136,7 @@ export function RecordingControls({
                         ) : (
                             <ActionButton
                                 variant="secondary"
-                                icon={<Pause className="fill-current size-3.5" />}
+                                icon={<Pause className="h-3.5 w-3.5 fill-current" />}
                                 onClick={onPause}
                             >
                                 Pause
@@ -136,26 +145,26 @@ export function RecordingControls({
 
                         <ActionButton
                             variant="destructive"
-                            icon={<Square className="size-3.5" strokeWidth={2.5} />}
+                            icon={<Square className="h-3.5 w-3.5" strokeWidth={2.5} />}
                             onClick={onStop}
                         >
-                            Stop recording
+                            Stop
                         </ActionButton>
 
                         <ActionButton
                             variant="ghost"
-                            icon={<RotateCcw className="size-3" />}
+                            icon={<RotateCcw className="h-3 w-3" />}
                             onClick={onRestart}
-                            title="Restart recording from beginning"
+                            title="Restart from beginning"
                         >
                             Restart
                         </ActionButton>
 
                         <ActionButton
                             variant="ghost"
-                            icon={<Trash2 className="size-3 text-destructive" />}
+                            icon={<Trash2 className="h-3 w-3 text-destructive" />}
                             onClick={onCancel}
-                            title="Cancel and discard recording"
+                            title="Cancel and discard"
                         >
                             Cancel
                         </ActionButton>
@@ -164,11 +173,9 @@ export function RecordingControls({
                     <ActionButton
                         variant={isError ? 'secondary' : 'primary'}
                         icon={
-                            isBusy || isCountingDown ? (
-                                <Loader2 className="size-3.5 animate-spin" />
-                            ) : (
-                                <Circle className="fill-current size-3.5" strokeWidth={0} />
-                            )
+                            isBusy || isCountingDown
+                                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                : <Circle className="h-3.5 w-3.5 fill-current" strokeWidth={0} />
                         }
                         onClick={onStart}
                         disabled={!canStart || isBusy || isCountingDown}
@@ -187,14 +194,14 @@ export function RecordingControls({
                     <>
                         <ActionButton
                             variant="primary"
-                            icon={<Download className="size-3.5" />}
+                            icon={<Download className="h-3.5 w-3.5" />}
                             onClick={onDownload}
                         >
                             Download
                         </ActionButton>
                         <ActionButton
                             variant="ghost"
-                            icon={<RotateCcw className="size-3" />}
+                            icon={<RotateCcw className="h-3 w-3" />}
                             onClick={onReset}
                         >
                             Discard
@@ -206,7 +213,7 @@ export function RecordingControls({
     )
 }
 
-// ─── Internal button ──────────────────────────────────────────────────────────
+/* ── ActionButton ──────────────────────────────────────────────────────── */
 
 type ActionButtonVariant = 'primary' | 'destructive' | 'secondary' | 'ghost'
 
@@ -220,22 +227,10 @@ type ActionButtonProps = {
 }
 
 const variantClasses: Record<ActionButtonVariant, string> = {
-    primary: [
-        'bg-primary text-primary-foreground shadow-sm',
-        'hover:bg-primary/90 active:bg-primary/80 active:scale-[0.98]'
-    ].join(' '),
-    destructive: [
-        'bg-destructive/10 text-destructive border border-destructive/20',
-        'hover:bg-destructive/20 active:bg-destructive/25 active:scale-[0.98]'
-    ].join(' '),
-    secondary: [
-        'bg-secondary text-secondary-foreground border border-border',
-        'hover:bg-accent active:scale-[0.98]'
-    ].join(' '),
-    ghost: [
-        'text-muted-foreground border border-border/50',
-        'hover:bg-muted hover:text-foreground active:scale-[0.98]'
-    ].join(' ')
+    primary: 'bg-primary text-white shadow-sm hover:bg-primary/90 active:bg-primary/80',
+    destructive: 'bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20',
+    secondary: 'bg-secondary text-secondary-foreground border border-border hover:bg-accent',
+    ghost: 'text-muted-foreground border border-border/50 hover:bg-muted hover:text-foreground'
 }
 
 function ActionButton({
@@ -253,11 +248,13 @@ function ActionButton({
             disabled={disabled}
             title={title}
             className={[
-                'inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold',
-                'transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-                'disabled:pointer-events-none disabled:opacity-50',
+                'inline-flex items-center rounded-lg text-xs font-semibold',
+                'transition-all duration-150 focus:outline-none',
+                'focus-visible:ring-2 focus-visible:ring-ring/50',
+                'active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50',
                 variantClasses[variant]
             ].join(' ')}
+            style={{ gap: '6px', paddingBlock: '8px', paddingInline: '14px' }}
         >
             {icon}
             {children}

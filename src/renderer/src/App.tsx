@@ -6,7 +6,8 @@ import {
     Download,
     RotateCcw,
     CheckCircle2,
-    FileVideo
+    FileVideo,
+    Video
 } from 'lucide-react'
 import { useCaptureSources } from '@/features/recorder/hooks/use-capture-sources'
 import { useRecorder } from '@/features/recorder/hooks/use-recorder'
@@ -18,9 +19,7 @@ import { RecordingControls } from '@/features/recorder/components/recording-cont
 import { CountdownOverlay } from '@/features/recorder/components/countdown-overlay'
 
 function formatDuration(totalSeconds: number): string {
-    const m = Math.floor(totalSeconds / 60)
-        .toString()
-        .padStart(2, '0')
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
     const s = (totalSeconds % 60).toString().padStart(2, '0')
     return `${m}:${s}`
 }
@@ -31,16 +30,13 @@ function formatBytes(bytes: number): string {
 }
 
 const App = (): React.JSX.Element => {
-    // ── Theme ───────────────────────────────────────────────────────────────
     const { theme, resolved, cycle } = useTheme()
 
-    // ── Audio state ─────────────────────────────────────────────────────────
     const [micEnabled, setMicEnabled] = useState(false)
     const [micDeviceId, setMicDeviceId] = useState('default')
     const [sysAudioEnabled, setSysAudioEnabled] = useState(true)
     const [sysAudioDeviceId, setSysAudioDeviceId] = useState('auto')
 
-    // ── Data hooks ──────────────────────────────────────────────────────────
     const {
         sources,
         selectedSourceId,
@@ -63,7 +59,6 @@ const App = (): React.JSX.Element => {
         recorder.status === 'requesting-permission' ||
         recorder.status === 'stopping'
 
-    // ── Actions ─────────────────────────────────────────────────────────────
     const handleStart = useCallback(() => {
         if (!selectedSourceId) return
         const source = sources.find((s) => s.id === selectedSourceId)
@@ -102,13 +97,10 @@ const App = (): React.JSX.Element => {
         URL.revokeObjectURL(url)
     }, [recorder])
 
-    // Cancel countdown on Escape key
     useEffect(() => {
         if (recorder.countdown <= 0) return
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                recorder.cancelCountdown()
-            }
+        const onKeyDown = (e: KeyboardEvent): void => {
+            if (e.key === 'Escape') recorder.cancelCountdown()
         }
         window.addEventListener('keydown', onKeyDown)
         return () => window.removeEventListener('keydown', onKeyDown)
@@ -117,8 +109,11 @@ const App = (): React.JSX.Element => {
     const canStart = Boolean(selectedSourceId) && !isLoading && !isRecordingActive
 
     return (
-        <div className="flex flex-col bg-background border border-border/50 w-screen h-screen overflow-hidden select-none">
-            {/* ── Frameless Title Bar ──────────────────────────────────────── */}
+        <div
+            className="flex h-screen w-screen flex-col overflow-hidden bg-background select-none"
+            style={{ borderRadius: 'inherit' }}
+        >
+            {/* ── Title Bar ──────────────────────────────────────────────── */}
             <TitleBar
                 theme={theme}
                 resolvedTheme={resolved}
@@ -126,110 +121,132 @@ const App = (): React.JSX.Element => {
                 platform={capabilities.platform}
             />
 
-            {/* ── Loom 3-2-1 Animated Countdown Overlay ───────────────────── */}
+            {/* ── Countdown Overlay ──────────────────────────────────────── */}
             {recorder.countdown > 0 && (
                 <CountdownOverlay count={recorder.countdown} onCancel={recorder.cancelCountdown} />
             )}
 
-            {/* ── Main Studio Body ─────────────────────────────────────────── */}
-            <div className="flex flex-col flex-1 overflow-hidden">
+            {/* ── Main Content ───────────────────────────────────────────── */}
+            <div className="flex flex-1 flex-col overflow-hidden">
+
                 {recorder.status === 'ready' && recorder.recording ? (
-                    /* ══════════════════════════════════════════════════════════
-                       REVIEW SUITE (Recording Complete)
-                       ══════════════════════════════════════════════════════════ */
-                    <div className="flex flex-col flex-1 justify-between mx-auto p-6 w-full max-w-3xl overflow-y-auto animate-in duration-200 fade-in zoom-in-95">
-                        {/* Header */}
-                        <div className="flex justify-between items-center pb-3 border-border/40 border-b">
-                            <div className="flex items-center gap-3">
-                                <div className="flex justify-center items-center bg-emerald-500/15 rounded-xl size-9 text-emerald-500">
-                                    <CheckCircle2 className="size-5" />
+                    /* ════════════════════════════════════════════════════════
+                       REVIEW SUITE
+                    ════════════════════════════════════════════════════════ */
+                    <div className="flex flex-1 flex-col overflow-y-auto" style={{ padding: '20px 24px' }}>
+                        <div className="mx-auto flex w-full max-w-2xl flex-col" style={{ gap: '16px' }}>
+
+                            {/* Review header */}
+                            <div
+                                className="flex items-center justify-between border-b border-border/40"
+                                style={{ paddingBottom: '14px' }}
+                            >
+                                <div className="flex items-center" style={{ gap: '10px' }}>
+                                    <div
+                                        className="flex items-center justify-center rounded-xl bg-emerald-500/12 text-emerald-500"
+                                        style={{ width: '36px', height: '36px' }}
+                                    >
+                                        <CheckCircle2 className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-sm font-semibold text-foreground">
+                                            Recording complete
+                                        </h2>
+                                        <p className="text-[11px] text-muted-foreground" style={{ marginTop: '1px' }}>
+                                            Review your capture or save it locally.
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 className="font-bold text-foreground text-base">
-                                        Recording Complete
-                                    </h2>
-                                    <p className="text-[11px] text-muted-foreground">
-                                        Review your capture or save it locally.
-                                    </p>
+
+                                <div className="flex items-center" style={{ gap: '8px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={recorder.reset}
+                                        className="flex items-center rounded-lg border border-border bg-card text-xs font-medium text-foreground transition-colors hover:bg-muted active:scale-95"
+                                        style={{ gap: '6px', paddingBlock: '7px', paddingInline: '12px' }}
+                                    >
+                                        <RotateCcw className="h-3.5 w-3.5" />
+                                        New recording
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleDownload}
+                                        className="flex items-center rounded-lg bg-primary text-xs font-semibold text-white shadow-sm transition-all hover:bg-primary/90 active:scale-95"
+                                        style={{ gap: '6px', paddingBlock: '7px', paddingInline: '14px' }}
+                                    >
+                                        <Download className="h-3.5 w-3.5" />
+                                        Download
+                                    </button>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={recorder.reset}
-                                    className="flex items-center gap-1.5 bg-card hover:bg-muted px-3.5 py-1.5 border border-border rounded-xl font-semibold text-foreground text-xs active:scale-95 transition-all"
-                                >
-                                    <RotateCcw className="size-3.5" />
-                                    New recording
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={handleDownload}
-                                    className="flex items-center gap-2 bg-linear-to-r from-primary to-indigo-600 hover:opacity-95 shadow-md shadow-primary/25 px-4 py-1.5 rounded-xl font-bold text-white text-xs active:scale-95 transition-all"
-                                >
-                                    <Download className="size-3.5" />
-                                    Download video
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Video Player Card */}
-                        <div className="relative flex justify-center items-center bg-black shadow-xl my-4 border border-border/80 rounded-2xl max-h-80 overflow-hidden">
-                            <video
-                                src={recorder.previewUrl || undefined}
-                                controls
-                                autoPlay
-                                playsInline
-                                className="w-full max-h-80 object-contain"
-                            />
-                        </div>
-
-                        {/* Metadata chips */}
-                        <div className="flex justify-between items-center bg-card/60 px-4 py-3 border border-border/60 rounded-xl text-xs">
-                            <div className="flex items-center gap-3">
-                                <FileVideo className="size-4 text-muted-foreground" />
-                                <span className="font-semibold text-foreground">
-                                    {recorder.recording.name}.webm
-                                </span>
-                                <span className="text-muted-foreground/50">·</span>
-                                <span className="bg-muted px-2 py-0.5 rounded font-medium text-muted-foreground">
-                                    {formatDuration(
-                                        Math.round(recorder.recording.durationMs / 1000)
-                                    )}
-                                </span>
-                                <span className="bg-muted px-2 py-0.5 rounded font-medium text-muted-foreground">
-                                    {formatBytes(recorder.recording.sizeBytes)}
-                                </span>
+                            {/* Video player */}
+                            <div className="overflow-hidden rounded-2xl border border-border/60 bg-black shadow-lg">
+                                <video
+                                    src={recorder.previewUrl || undefined}
+                                    controls
+                                    autoPlay
+                                    playsInline
+                                    className="w-full max-h-72 object-contain"
+                                />
                             </div>
 
-                            <span className="font-medium text-emerald-500">
-                                {recorder.recording.hasAudio
-                                    ? '🔊 Stereo Audio Mixed'
-                                    : '🔇 Video Only'}
-                            </span>
+                            {/* Metadata strip */}
+                            <div
+                                className="flex items-center justify-between rounded-xl border border-border/50 bg-card/60"
+                                style={{ paddingBlock: '10px', paddingInline: '14px' }}
+                            >
+                                <div className="flex items-center" style={{ gap: '10px' }}>
+                                    <FileVideo className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-xs font-semibold text-foreground">
+                                        {recorder.recording.name}.webm
+                                    </span>
+                                    <span className="text-muted-foreground/40">·</span>
+                                    <span
+                                        className="rounded bg-muted text-xs font-medium text-muted-foreground"
+                                        style={{ paddingBlock: '2px', paddingInline: '7px' }}
+                                    >
+                                        {formatDuration(Math.round(recorder.recording.durationMs / 1000))}
+                                    </span>
+                                    <span
+                                        className="rounded bg-muted text-xs font-medium text-muted-foreground"
+                                        style={{ paddingBlock: '2px', paddingInline: '7px' }}
+                                    >
+                                        {formatBytes(recorder.recording.sizeBytes)}
+                                    </span>
+                                </div>
+                                <span className="text-xs font-medium text-emerald-500">
+                                    {recorder.recording.hasAudio ? '🔊 Audio' : '🔇 Video only'}
+                                </span>
+                            </div>
                         </div>
                     </div>
+
                 ) : isRecordingActive ? (
-                    /* ══════════════════════════════════════════════════════════
-                       ACTIVE RECORDING DASHBOARD
-                       ══════════════════════════════════════════════════════════ */
-                    <div className="flex flex-1 justify-center items-center p-8 text-center animate-in duration-200 fade-in">
-                        <div className="flex flex-col items-center gap-5 bg-card/90 shadow-2xl backdrop-blur-xl p-8 border border-border/80 rounded-3xl max-w-sm">
-                            <div className="flex justify-center items-center bg-red-500/10 rounded-full size-14 text-red-500">
-                                <span className="bg-red-500 rounded-full size-4 recording-pulse" />
+                    /* ════════════════════════════════════════════════════════
+                       RECORDING ACTIVE
+                    ════════════════════════════════════════════════════════ */
+                    <div className="flex flex-1 items-center justify-center" style={{ padding: '32px' }}>
+                        <div
+                            className="fade-in flex flex-col items-center rounded-2xl border border-border/60 bg-card shadow-xl backdrop-blur-xl"
+                            style={{ padding: '32px 28px', gap: '20px', maxWidth: '340px', width: '100%' }}
+                        >
+                            {/* Status indicator */}
+                            <div
+                                className="flex items-center justify-center rounded-full bg-red-500/10"
+                                style={{ width: '56px', height: '56px' }}
+                            >
+                                <span className="recording-pulse block h-4 w-4 rounded-full bg-red-500" />
                             </div>
 
-                            <div>
-                                <h2 className="font-bold text-foreground text-lg tracking-tight">
+                            <div className="text-center">
+                                <h2 className="text-base font-semibold tracking-tight text-foreground">
                                     {recorder.status === 'paused'
-                                        ? 'Recording Paused'
-                                        : 'Recording in Progress'}
+                                        ? 'Recording paused'
+                                        : 'Recording in progress'}
                                 </h2>
-                                <p className="mt-1 text-muted-foreground text-xs">
-                                    The floating pill is on your screen. You can control this
-                                    recording from any app.
+                                <p className="text-xs text-muted-foreground" style={{ marginTop: '5px' }}>
+                                    Control your recording from the floating pill on screen.
                                 </p>
                             </div>
 
@@ -249,22 +266,27 @@ const App = (): React.JSX.Element => {
                             />
                         </div>
                     </div>
+
                 ) : (
-                    /* ══════════════════════════════════════════════════════════
-                       LOOM STUDIO LAUNCHER (Pre-Recording Setup)
-                       ══════════════════════════════════════════════════════════ */
-                    <div className="flex flex-col flex-1 overflow-hidden">
-                        {/* ── Studio Content (Scrollable if needed) ───────── */}
-                        <div className="flex-1 px-6 py-4 overflow-y-auto">
-                            <div className="flex flex-col gap-4 mx-auto max-w-4xl">
-                                {/* Header */}
-                                <div className="flex justify-between items-center pb-1">
+                    /* ════════════════════════════════════════════════════════
+                       SETUP / LAUNCHER
+                    ════════════════════════════════════════════════════════ */
+                    <div className="flex flex-1 flex-col overflow-hidden">
+                        {/* Scrollable body */}
+                        <div className="flex-1 overflow-y-auto" style={{ padding: '18px 20px' }}>
+                            <div className="mx-auto flex max-w-4xl flex-col" style={{ gap: '14px' }}>
+
+                                {/* Section heading row */}
+                                <div className="flex items-center justify-between">
                                     <div>
-                                        <h1 className="font-extrabold text-foreground text-base tracking-tight">
-                                            Recording Studio
+                                        <h1 className="text-sm font-semibold text-foreground">
+                                            New Recording
                                         </h1>
-                                        <p className="text-[11px] text-muted-foreground">
-                                            Choose your screen source and audio preferences below.
+                                        <p
+                                            className="text-muted-foreground"
+                                            style={{ marginTop: '2px', fontSize: '11px' }}
+                                        >
+                                            Choose a source and configure audio below.
                                         </p>
                                     </div>
 
@@ -272,36 +294,41 @@ const App = (): React.JSX.Element => {
                                         type="button"
                                         onClick={() => void refresh()}
                                         disabled={isLoading || isRecordingActive}
-                                        className="flex items-center gap-1.5 bg-card hover:bg-muted disabled:opacity-40 px-2.5 py-1 border border-border/60 rounded-lg font-semibold text-muted-foreground hover:text-foreground text-xs active:scale-95 transition-all"
+                                        className="flex items-center rounded-lg border border-border/60 bg-card text-xs font-medium text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:opacity-40 active:scale-95"
+                                        style={{ gap: '5px', paddingBlock: '6px', paddingInline: '10px' }}
                                     >
                                         <RefreshCw
-                                            className={[
-                                                'size-3',
-                                                isLoading ? 'animate-spin' : ''
-                                            ].join(' ')}
+                                            className={['h-3 w-3', isLoading ? 'animate-spin' : ''].join(' ')}
                                         />
                                         Refresh
                                     </button>
                                 </div>
 
-                                {/* Main 2-column Grid */}
-                                <div className="gap-4 grid md:grid-cols-[1fr_320px]">
+                                {/* Two-column layout */}
+                                <div className="grid md:grid-cols-[1fr_300px]" style={{ gap: '12px' }}>
                                     {/* Left: Source Picker */}
-                                    <div className="flex flex-col gap-3 bg-card/60 shadow-sm p-4 border border-border/70 rounded-2xl">
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-bold text-[11px] text-muted-foreground uppercase tracking-wider">
-                                                Capture Source
-                                            </span>
-                                        </div>
+                                    <div
+                                        className="flex flex-col rounded-xl border border-border/60 bg-card/60 shadow-sm"
+                                        style={{ padding: '14px', gap: '10px' }}
+                                    >
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                            Capture Source
+                                        </span>
 
                                         {isLoading ? (
-                                            <div className="flex justify-center items-center gap-3 bg-muted/20 rounded-xl h-44 text-muted-foreground text-xs">
-                                                <Loader2 className="size-4 animate-spin" />
+                                            <div
+                                                className="flex items-center justify-center rounded-xl bg-muted/20 text-xs text-muted-foreground"
+                                                style={{ height: '160px', gap: '8px' }}
+                                            >
+                                                <Loader2 className="h-4 w-4 animate-spin" />
                                                 Scanning screens & windows…
                                             </div>
                                         ) : sourcesError ? (
-                                            <div className="flex items-start gap-2 bg-destructive/5 p-3 border border-destructive/20 rounded-xl text-destructive text-xs">
-                                                <AlertCircle className="size-4 shrink-0" />
+                                            <div
+                                                className="flex items-start rounded-xl border border-destructive/20 bg-destructive/5 text-xs text-destructive"
+                                                style={{ gap: '8px', padding: '10px' }}
+                                            >
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
                                                 {sourcesError}
                                             </div>
                                         ) : (
@@ -314,10 +341,13 @@ const App = (): React.JSX.Element => {
                                         )}
                                     </div>
 
-                                    {/* Right: Audio Deck */}
-                                    <div className="flex flex-col gap-3 bg-card/60 shadow-sm p-4 border border-border/70 rounded-2xl">
-                                        <span className="font-bold text-[11px] text-muted-foreground uppercase tracking-wider">
-                                            Audio Settings
+                                    {/* Right: Audio Settings */}
+                                    <div
+                                        className="flex flex-col rounded-xl border border-border/60 bg-card/60 shadow-sm"
+                                        style={{ padding: '14px', gap: '10px' }}
+                                    >
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                            Audio
                                         </span>
 
                                         <AudioSettings
@@ -330,9 +360,7 @@ const App = (): React.JSX.Element => {
                                             sysAudioEnabled={sysAudioEnabled}
                                             sysAudioDeviceId={sysAudioDeviceId}
                                             sysAudioDevices={systemAudioDevices}
-                                            canCaptureSystemAudio={
-                                                capabilities.canCaptureSystemAudio
-                                            }
+                                            canCaptureSystemAudio={capabilities.canCaptureSystemAudio}
                                             platform={capabilities.platform}
                                             onSysAudioEnabledChange={setSysAudioEnabled}
                                             onSysAudioDeviceChange={setSysAudioDeviceId}
@@ -344,26 +372,31 @@ const App = (): React.JSX.Element => {
                             </div>
                         </div>
 
-                        {/* ── Fixed Loom Bottom Action Dock ───────────────── */}
-                        <footer className="bg-card/80 backdrop-blur-md px-6 py-3 border-border/50 border-t">
-                            <div className="flex justify-between items-center mx-auto max-w-4xl">
-                                {/* Helper pill info */}
-                                <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                                    <span className="bg-primary rounded-full size-2 animate-pulse" />
+                        {/* ── Bottom Action Bar ───────────────────────────── */}
+                        <footer
+                            className="shrink-0 border-t border-border/50 bg-card/70 backdrop-blur-md"
+                            style={{ padding: '12px 20px' }}
+                        >
+                            <div
+                                className="mx-auto flex max-w-4xl items-center justify-between"
+                            >
+                                {/* Loom pill hint */}
+                                <div className="flex items-center text-xs text-muted-foreground" style={{ gap: '7px' }}>
+                                    <Video className="h-3.5 w-3.5 text-primary/70" />
                                     <span>
-                                        <strong className="text-foreground">Loom Pill:</strong>{' '}
-                                        Stays on top to Pause, Restart, or Finish anywhere.
+                                        A <strong className="text-foreground font-medium">floating pill</strong> will appear during recording.
                                     </span>
                                 </div>
 
-                                {/* Record Action Button */}
-                                <div className="flex items-center gap-3">
+                                {/* Right: error + record button */}
+                                <div className="flex items-center" style={{ gap: '10px' }}>
                                     {recorder.error && (
-                                        <div className="flex items-center gap-1.5 text-destructive text-xs">
-                                            <AlertCircle className="size-3.5" />
-                                            <span className="max-w-50 truncate">
-                                                {recorder.error}
-                                            </span>
+                                        <div
+                                            className="flex items-center text-xs text-destructive"
+                                            style={{ gap: '5px' }}
+                                        >
+                                            <AlertCircle className="h-3.5 w-3.5" />
+                                            <span className="max-w-[180px] truncate">{recorder.error}</span>
                                         </div>
                                     )}
 
@@ -372,14 +405,22 @@ const App = (): React.JSX.Element => {
                                         onClick={handleStart}
                                         disabled={!canStart}
                                         className={[
-                                            'group relative flex items-center justify-center gap-2.5 rounded-xl px-7 py-2.5 text-xs font-bold text-white shadow-md transition-all duration-200',
+                                            'flex items-center rounded-xl text-xs font-semibold text-white',
+                                            'transition-all duration-200 focus:outline-none',
+                                            'focus-visible:ring-2 focus-visible:ring-primary/50',
                                             canStart
-                                                ? 'bg-linear-to-r from-indigo-600 via-violet-600 to-indigo-700 hover:from-indigo-500 hover:to-violet-500 shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]'
-                                                : 'bg-muted text-muted-foreground shadow-none cursor-not-allowed opacity-50'
+                                                ? 'bg-primary shadow-sm hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20 active:scale-[0.97]'
+                                                : 'cursor-not-allowed bg-muted text-muted-foreground shadow-none opacity-50'
                                         ].join(' ')}
+                                        style={{ gap: '8px', paddingBlock: '9px', paddingInline: '20px' }}
                                     >
-                                        <span className="bg-red-400 group-hover:bg-red-300 rounded-full size-2 transition-colors animate-pulse" />
-                                        <span>Start Recording</span>
+                                        <span
+                                            className={[
+                                                'block h-2 w-2 rounded-full',
+                                                canStart ? 'bg-white/70' : 'bg-current'
+                                            ].join(' ')}
+                                        />
+                                        Start Recording
                                     </button>
                                 </div>
                             </div>

@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, screen } from 'electron'
+import { BrowserWindow, ipcMain, screen } from 'electron/main'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import type { RecorderAction, WidgetState } from '../../shared/contracts/ipc'

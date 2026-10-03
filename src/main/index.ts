@@ -1,4 +1,5 @@
-import { app, shell, BrowserWindow, session, ipcMain } from 'electron'
+import { app, BrowserWindow, session, ipcMain } from 'electron/main'
+import { shell } from 'electron/common'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -83,6 +84,9 @@ function createWindow(): BrowserWindow {
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
+        if (is.dev) {
+            mainWindow.webContents.openDevTools()
+        }
     })
 
     mainWindow.on('close', (event) => {

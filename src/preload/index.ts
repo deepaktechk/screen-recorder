@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge } from 'electron/renderer'
 import { screenRecorderApi } from './api'
 
 const isolatedWindow = window as typeof window & {

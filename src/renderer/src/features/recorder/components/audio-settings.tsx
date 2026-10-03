@@ -42,213 +42,273 @@ export function AudioSettings({
     const hasMicDevices = micDevices.length > 0
 
     return (
-        <div className="flex flex-col gap-3">
-            {/* ── Microphone Card ────────────────────────────────────── */}
-            <div
-                className={[
-                    'flex flex-col rounded-2xl border transition-all duration-200',
-                    disabled
-                        ? 'border-border/40 bg-muted/20 opacity-50'
-                        : micEnabled
-                          ? 'border-primary/40 bg-primary/[0.03] shadow-sm'
-                          : 'border-border/70 bg-card hover:border-border'
-                ].join(' ')}
+        <div className="flex flex-col" style={{ gap: '10px' }}>
+            {/* ── Microphone ───────────────────────────────────────────── */}
+            <AudioCard
+                enabled={micEnabled}
+                disabled={disabled || !canCaptureMicrophone}
+                icon={
+                    micEnabled
+                        ? <Mic className="h-4 w-4" />
+                        : <MicOff className="h-4 w-4" />
+                }
+                title="Microphone"
+                subtitle={
+                    !canCaptureMicrophone
+                        ? 'Not available'
+                        : hasMicDevices
+                          ? `${micDevices.length} device${micDevices.length > 1 ? 's' : ''} found`
+                          : 'No microphones found'
+                }
+                onToggle={() => onMicEnabledChange(!micEnabled)}
             >
-                {/* Header Row */}
-                <div className="flex items-center justify-between p-3.5">
-                    <div className="flex items-center gap-3">
-                        <div
-                            className={[
-                                'flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors',
-                                micEnabled && !disabled
-                                    ? 'bg-primary/15 text-primary'
-                                    : 'bg-muted text-muted-foreground'
-                            ].join(' ')}
-                        >
-                            {micEnabled ? <Mic className="size-4.5" /> : <MicOff className="size-4.5" />}
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold leading-tight text-foreground">
-                                Microphone
-                            </p>
-                            <p className="mt-0.5 text-[11px] text-muted-foreground">
-                                {!canCaptureMicrophone
-                                    ? 'Not available'
-                                    : hasMicDevices
-                                      ? `${micDevices.length} device${micDevices.length > 1 ? 's' : ''} detected`
-                                      : 'No microphones found'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Switch */}
-                    <button
-                        type="button"
-                        role="switch"
-                        aria-checked={micEnabled}
-                        disabled={disabled || !canCaptureMicrophone}
-                        onClick={() => onMicEnabledChange(!micEnabled)}
-                        className={[
-                            'relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed',
-                            micEnabled && !disabled ? 'bg-primary' : 'bg-muted-foreground/25'
-                        ].join(' ')}
-                    >
-                        <span
-                            className={[
-                                'pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm transition-transform duration-200',
-                                micEnabled ? 'translate-x-[22px]' : 'translate-x-[2px]'
-                            ].join(' ')}
-                        />
-                    </button>
-                </div>
-
-                {/* Expanded Device Selector */}
                 {micEnabled && (
-                    <div className="border-t border-border/40 p-3 bg-muted/20 flex flex-col gap-2 rounded-b-2xl">
+                    <div
+                        className="border-t border-border/30 bg-muted/20"
+                        style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+                    >
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                Mic Device
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                Input Device
                             </span>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center" style={{ gap: '6px' }}>
                                 <AudioVisualizer enabled={micEnabled} deviceId={micDeviceId} />
                                 {onRefreshDevices && (
-                                    <button
-                                        type="button"
-                                        onClick={onRefreshDevices}
-                                        disabled={disabled}
-                                        className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                                        title="Refresh audio devices"
-                                    >
-                                        <RefreshCw className="size-2.5" />
-                                    </button>
+                                    <RefreshButton onClick={onRefreshDevices} disabled={disabled} />
                                 )}
                             </div>
                         </div>
 
                         {!hasMicDevices ? (
-                            <div className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-2.5 py-1.5 text-[11px] text-amber-500">
-                                <AlertTriangle className="size-3.5 shrink-0" />
-                                <span>No microphone detected</span>
-                            </div>
+                            <WarningBanner message="No microphone detected" />
                         ) : (
-                            <div className="relative">
-                                <select
-                                    value={micDeviceId}
-                                    disabled={disabled}
-                                    onChange={(e) => onMicDeviceChange(e.target.value)}
-                                    className="w-full appearance-none rounded-xl border border-border/80 bg-background py-1.5 pl-3 pr-8 text-xs font-medium text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 disabled:cursor-not-allowed"
-                                >
-                                    {micDevices.map((d) => (
-                                        <option key={d.deviceId} value={d.deviceId}>
-                                            🎙️ {d.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                            </div>
+                            <SelectInput
+                                value={micDeviceId}
+                                disabled={disabled}
+                                onChange={onMicDeviceChange}
+                            >
+                                {micDevices.map((d) => (
+                                    <option key={d.deviceId} value={d.deviceId}>
+                                        {d.label}
+                                    </option>
+                                ))}
+                            </SelectInput>
                         )}
                     </div>
                 )}
-            </div>
+            </AudioCard>
 
-            {/* ── System Audio Card ──────────────────────────────────── */}
-            <div
-                className={[
-                    'flex flex-col rounded-2xl border transition-all duration-200',
-                    disabled
-                        ? 'border-border/40 bg-muted/20 opacity-50'
-                        : sysAudioEnabled
-                          ? 'border-primary/40 bg-primary/[0.03] shadow-sm'
-                          : 'border-border/70 bg-card hover:border-border'
-                ].join(' ')}
+            {/* ── System Audio ─────────────────────────────────────────── */}
+            <AudioCard
+                enabled={sysAudioEnabled}
+                disabled={disabled || !canCaptureSystemAudio}
+                icon={
+                    sysAudioEnabled
+                        ? <Volume2 className="h-4 w-4" />
+                        : <VolumeX className="h-4 w-4" />
+                }
+                title="System Audio"
+                subtitle={
+                    !canCaptureSystemAudio
+                        ? 'Not supported on this platform'
+                        : platform === 'linux'
+                          ? 'PulseAudio / PipeWire Loopback'
+                          : 'Desktop & app sounds'
+                }
+                onToggle={() => onSysAudioEnabledChange(!sysAudioEnabled)}
             >
-                {/* Header Row */}
-                <div className="flex items-center justify-between p-3.5">
-                    <div className="flex items-center gap-3">
-                        <div
-                            className={[
-                                'flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors',
-                                sysAudioEnabled && !disabled
-                                    ? 'bg-primary/15 text-primary'
-                                    : 'bg-muted text-muted-foreground'
-                            ].join(' ')}
-                        >
-                            {sysAudioEnabled ? <Volume2 className="size-4.5" /> : <VolumeX className="size-4.5" />}
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold leading-tight text-foreground">
-                                System Audio
-                            </p>
-                            <p className="mt-0.5 text-[11px] text-muted-foreground">
-                                {!canCaptureSystemAudio
-                                    ? 'Not supported on this platform'
-                                    : platform === 'linux'
-                                      ? 'PulseAudio / PipeWire Loopback'
-                                      : 'Captures desktop & app sounds'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Switch */}
-                    <button
-                        type="button"
-                        role="switch"
-                        aria-checked={sysAudioEnabled}
-                        disabled={disabled || !canCaptureSystemAudio}
-                        onClick={() => onSysAudioEnabledChange(!sysAudioEnabled)}
-                        className={[
-                            'relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed',
-                            sysAudioEnabled && !disabled ? 'bg-primary' : 'bg-muted-foreground/25'
-                        ].join(' ')}
-                    >
-                        <span
-                            className={[
-                                'pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm transition-transform duration-200',
-                                sysAudioEnabled ? 'translate-x-[22px]' : 'translate-x-[2px]'
-                            ].join(' ')}
-                        />
-                    </button>
-                </div>
-
-                {/* Expanded System Audio Device (Linux Loopback) */}
                 {sysAudioEnabled && platform === 'linux' && (
-                    <div className="border-t border-border/40 p-3 bg-muted/20 flex flex-col gap-2 rounded-b-2xl">
+                    <div
+                        className="border-t border-border/30 bg-muted/20"
+                        style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+                    >
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                                 Loopback Source
                             </span>
                             {onRefreshDevices && (
-                                <button
-                                    type="button"
-                                    onClick={onRefreshDevices}
-                                    disabled={disabled}
-                                    className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                                    title="Refresh audio devices"
-                                >
-                                    <RefreshCw className="size-2.5" />
-                                </button>
+                                <RefreshButton onClick={onRefreshDevices} disabled={disabled} />
                             )}
                         </div>
 
-                        <div className="relative">
-                            <select
-                                value={sysAudioDeviceId}
-                                disabled={disabled}
-                                onChange={(e) => onSysAudioDeviceChange(e.target.value)}
-                                className="w-full appearance-none rounded-xl border border-border/80 bg-background py-1.5 pl-3 pr-8 text-xs font-medium text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 disabled:cursor-not-allowed"
-                            >
-                                <option value="auto">🔄 Auto-detect monitor</option>
-                                {sysAudioDevices.map((d) => (
-                                    <option key={d.deviceId} value={d.deviceId}>
-                                        🔊 {d.label}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                        </div>
+                        <SelectInput
+                            value={sysAudioDeviceId}
+                            disabled={disabled}
+                            onChange={onSysAudioDeviceChange}
+                        >
+                            <option value="auto">Auto-detect monitor</option>
+                            {sysAudioDevices.map((d) => (
+                                <option key={d.deviceId} value={d.deviceId}>
+                                    {d.label}
+                                </option>
+                            ))}
+                        </SelectInput>
                     </div>
                 )}
-            </div>
+            </AudioCard>
         </div>
+    )
+}
+
+/* ── AudioCard ─────────────────────────────────────────────────────────── */
+
+function AudioCard({
+    enabled,
+    disabled,
+    icon,
+    title,
+    subtitle,
+    onToggle,
+    children
+}: {
+    enabled: boolean
+    disabled: boolean
+    icon: React.ReactNode
+    title: string
+    subtitle: string
+    onToggle: () => void
+    children?: React.ReactNode
+}): React.JSX.Element {
+    return (
+        <div
+            className={[
+                'flex flex-col overflow-hidden rounded-xl border transition-all duration-200',
+                disabled
+                    ? 'border-border/30 bg-muted/10 opacity-50'
+                    : enabled
+                      ? 'border-primary/30 bg-primary/[0.03]'
+                      : 'border-border/50 bg-card hover:border-border/70'
+            ].join(' ')}
+        >
+            {/* Header */}
+            <div
+                className="flex items-center justify-between"
+                style={{ padding: '12px 14px' }}
+            >
+                <div className="flex items-center" style={{ gap: '10px' }}>
+                    {/* Icon */}
+                    <div
+                        className={[
+                            'flex shrink-0 items-center justify-center rounded-lg transition-colors',
+                            enabled && !disabled
+                                ? 'bg-primary/12 text-primary'
+                                : 'bg-muted text-muted-foreground'
+                        ].join(' ')}
+                        style={{ width: '34px', height: '34px' }}
+                    >
+                        {icon}
+                    </div>
+
+                    {/* Text */}
+                    <div>
+                        <p className="text-xs font-semibold leading-tight text-foreground">
+                            {title}
+                        </p>
+                        <p
+                            className="leading-tight text-muted-foreground"
+                            style={{ marginTop: '2px', fontSize: '11px' }}
+                        >
+                            {subtitle}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Toggle switch */}
+                <button
+                    type="button"
+                    role="switch"
+                    aria-checked={enabled}
+                    disabled={disabled}
+                    onClick={onToggle}
+                    className={[
+                        'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full',
+                        'transition-colors duration-200 focus:outline-none',
+                        'focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed',
+                        enabled && !disabled ? 'bg-primary' : 'bg-muted-foreground/25'
+                    ].join(' ')}
+                >
+                    <span
+                        className={[
+                            'pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200',
+                            enabled ? 'translate-x-4' : 'translate-x-0.5'
+                        ].join(' ')}
+                    />
+                </button>
+            </div>
+
+            {/* Expandable content */}
+            {children}
+        </div>
+    )
+}
+
+/* ── SelectInput ───────────────────────────────────────────────────────── */
+
+function SelectInput({
+    value,
+    disabled,
+    onChange,
+    children
+}: {
+    value: string
+    disabled: boolean
+    onChange: (val: string) => void
+    children: React.ReactNode
+}): React.JSX.Element {
+    return (
+        <div className="relative">
+            <select
+                value={value}
+                disabled={disabled}
+                onChange={(e) => onChange(e.target.value)}
+                className={[
+                    'w-full appearance-none rounded-lg border border-border/70 bg-background',
+                    'text-xs font-medium text-foreground',
+                    'transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30',
+                    'disabled:cursor-not-allowed'
+                ].join(' ')}
+                style={{ paddingBlock: '7px', paddingInlineStart: '10px', paddingInlineEnd: '28px' }}
+            >
+                {children}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        </div>
+    )
+}
+
+/* ── WarningBanner ─────────────────────────────────────────────────────── */
+
+function WarningBanner({ message }: { message: string }): React.JSX.Element {
+    return (
+        <div
+            className="flex items-center rounded-lg border border-amber-500/20 bg-amber-500/5 text-amber-500"
+            style={{ gap: '6px', paddingBlock: '7px', paddingInline: '10px', fontSize: '11px' }}
+        >
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            <span>{message}</span>
+        </div>
+    )
+}
+
+/* ── RefreshButton ─────────────────────────────────────────────────────── */
+
+function RefreshButton({
+    onClick,
+    disabled
+}: {
+    onClick: () => void
+    disabled: boolean
+}): React.JSX.Element {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            className="flex items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            style={{ gap: '3px', paddingBlock: '2px', paddingInline: '5px', fontSize: '10px' }}
+            title="Refresh audio devices"
+        >
+            <RefreshCw className="h-2.5 w-2.5" />
+        </button>
     )
 }
